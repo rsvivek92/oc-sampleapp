@@ -1,0 +1,35 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: myapp-postgres
+spec:
+  replicas: 1
+  selector:
+    app: myapp-postgres
+    deploymentconfig: myapp-postgres
+  template:
+    metadata:
+      labels:
+        app: myapp-postgres
+        deploymentconfig: myapp-postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+              claimName: database-persistent-volume-claim
+      containers:
+        - image: 172.30.1.1:5000/sample-app/myapp-postgres
+          ports:
+            - containerPort: 5432
+          name: myapp-postgres
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/postgres

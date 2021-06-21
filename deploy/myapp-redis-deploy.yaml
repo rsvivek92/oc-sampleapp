@@ -1,0 +1,20 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  name: myapp-redis
+spec:
+  replicas: 1
+  selector:
+    app: myapp-redis
+    deploymentconfig: myapp-redis
+  template:
+    metadata:
+      labels:
+        app: myapp-redis
+        deploymentconfig: myapp-redis
+    spec:
+      containers:
+        - image: 172.30.1.1:5000/sample-app/myapp-redis
+          ports:
+            - containerPort: 6379
+          name: myapp-redis
